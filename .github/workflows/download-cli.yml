@@ -1,16 +1,13 @@
-name: Download VS Code CLI
+name: Download VS Code Server
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * 0'
 
-# اضافه کردن مجوز نوشتن
 permissions:
   contents: write
 
 jobs:
-  download-and-commit:
+  download:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -18,15 +15,14 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Download VS Code CLI
+      - name: Download VS Code Server
         run: |
-          wget "https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64" -O code-cli.tar.gz
+          wget "https://update.code.visualstudio.com/commit:072586267e68ece9a47aa43f8c108e0dcbf44622/server-linux-x64/stable" -O vscode-server-linux-x64.tar.gz
       
       - name: Commit and Push
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add code-cli.tar.gz
-          # فقط اگر فایل تغییر کرده باشد commit می‌کند
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update VS Code CLI binary"
+          git add vscode-server-linux-x64.tar.gz
+          git diff --quiet && git diff --staged --quiet || git commit -m "Add VS Code Server"
           git push
