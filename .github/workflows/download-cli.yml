@@ -1,9 +1,13 @@
 name: Download VS Code CLI
 
 on:
-  workflow_dispatch: # اجازه اجرای دستی
+  workflow_dispatch:
   schedule:
-    - cron: '0 0 * * 0' # هر یکشنبه به‌روزرسانی شود (اختیاری)
+    - cron: '0 0 * * 0'
+
+# اضافه کردن مجوز نوشتن
+permissions:
+  contents: write
 
 jobs:
   download-and-commit:
@@ -11,15 +15,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
       - name: Download VS Code CLI
         run: |
           wget "https://code.visualstudio.com/sha/download?build=stable&os=cli-alpine-x64" -O code-cli.tar.gz
-
-      - name: Commit file to repository
+      
+      - name: Commit and Push
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add code-cli.tar.gz
-          git commit -m "Update VS Code CLI binary" || echo "No changes to commit"
+          # فقط اگر فایل تغییر کرده باشد commit می‌کند
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update VS Code CLI binary"
           git push
