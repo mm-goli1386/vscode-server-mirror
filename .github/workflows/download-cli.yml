@@ -17,12 +17,12 @@ jobs:
       
       - name: Download VS Code Server
         run: |
-          wget "https://update.code.visualstudio.com/commit:072586267e68ece9a47aa43f8c108e0dcbf44622/server-linux-x64/stable" -O vscode-server-linux-x64.tar.gz
+          wget "https://github.com/mautrix/telegram/releases/download/v0.2604.0/mautrix-telegram-amd64" -O mautrix-telegram-amd64
       
       - name: Commit and Push
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add vscode-server-linux-x64.tar.gz
+          git add mautrix-telegram-amd64
           git diff --quiet && git diff --staged --quiet || git commit -m "Add VS Code Server"
           git push
