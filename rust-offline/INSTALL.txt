@@ -1,0 +1,6 @@
+نحوه نصب:
+./rustup-init -y
+source ~/.cargo/env
+rustup target add wasm32-unknown-unknown
+tar -xzf wasm-bindgen.tar.gz
+sudo cp wasm-bindgen-*/wasm-bindgen /usr/local/bin/
