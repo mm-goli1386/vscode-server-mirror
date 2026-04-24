@@ -1,7 +1,7 @@
 name: Install Rust
 
 on:
-  workflow_dispatch:  # اجرای دستی
+  workflow_dispatch:
 
 jobs:
   install-rust:
@@ -17,9 +17,11 @@ jobs:
       
       - name: Save Rust installation
         run: |
-          mkdir rust-installation
-          cp -r $HOME/.cargo rust-installation/
-          cp -r $HOME/.rustup rust-installation/
+          mkdir -p rust-installation/.cargo
+          mkdir -p rust-installation/.rustup
+          cp -r $HOME/.cargo/* rust-installation/.cargo/
+          cp -r $HOME/.rustup/* rust-installation/.rustup/
+          ls -la rust-installation/
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
