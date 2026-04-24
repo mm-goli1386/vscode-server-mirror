@@ -6,6 +6,9 @@ on:
 permissions:
   contents: write
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   download:
     runs-on: ubuntu-latest
@@ -18,18 +21,23 @@ jobs:
           mkdir -p rust-offline
           cd rust-offline
           
-          # دانلود فایل نصاب اصلی
-          wget https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init
+          # روش 1: دانلود با curl (معتبرتر از wget در اکشن)
+          curl -L -o rustup-init https://github.com/rust-lang/rustup/releases/download/1.27.1/rustup-init-x86_64-unknown-linux-gnu
           chmod +x rustup-init
           
-          # دانلود فایل‌های اجزای Rust (اختیاری، اما برای نصب کامل آفلاین مفید است)
-          wget https://static.rust-lang.org/dist/rust-1.85.0-x86_64-unknown-linux-gnu.tar.gz
-          wget https://static.rust-lang.org/dist/rust-std-1.85.0-x86_64-unknown-linux-gnu.tar.gz
-          wget https://static.rust-lang.org/dist/cargo-1.85.0-x86_64-unknown-linux-gnu.tar.gz
-          wget https://static.rust-lang.org/dist/rust-std-1.85.0-wasm32-unknown-unknown.tar.gz
+          # روش 2: دانلود بسته کامل Rust (نسخه پایدار)
+          curl -L -o rust.tar.gz https://github.com/rust-lang/rust/archive/refs/tags/1.85.0.tar.gz
           
-          # دانلود wasm-bindgen-cli از GitHub (نیازمند لینک صحیح)
-          wget https://github.com/rustwasm/wasm-bindgen/releases/download/0.2.102/wasm-bindgen-0.2.102-x86_64-unknown-linux-gnu.tar.gz
+          # روش 3: دانلود wasm-bindgen
+          curl -L -o wasm-bindgen.tar.gz https://github.com/rustwasm/wasm-bindgen/releases/download/0.2.102/wasm-bindgen-0.2.102-x86_64-unknown-linux-gnu.tar.gz
+          
+          # ایجاد فایل راهنما
+          echo "نحوه نصب:" > INSTALL.txt
+          echo "./rustup-init -y" >> INSTALL.txt
+          echo "source ~/.cargo/env" >> INSTALL.txt
+          echo "rustup target add wasm32-unknown-unknown" >> INSTALL.txt
+          echo "tar -xzf wasm-bindgen.tar.gz" >> INSTALL.txt
+          echo "sudo cp wasm-bindgen-*/wasm-bindgen /usr/local/bin/" >> INSTALL.txt
 
       - name: Commit and Push
         run: |
