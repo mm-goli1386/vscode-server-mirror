@@ -8,22 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Install Rust
+      - name: Install Rust and package
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-      
-      - name: Create artifact
-        run: |
-          mkdir -p rust-artifact
-          cp -r $HOME/.cargo rust-artifact/
-          cp -r $HOME/.rustup rust-artifact/
-          echo "Files copied:"
-          ls -la rust-artifact/
-          ls -la rust-artifact/.cargo/
-          ls -la rust-artifact/.rustup/
+          tar -czf rust-full.tar.gz -C $HOME .cargo .rustup
+          ls -lh rust-full.tar.gz
       
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: rust-installation
-          path: rust-artifact
+          name: rust-full
+          path: rust-full.tar.gz
