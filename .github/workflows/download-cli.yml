@@ -7,7 +7,7 @@ jobs:
   download-and-commit:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # اجازه push به مخزن
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -15,16 +15,18 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Download the file (مثال: نصب Rust)
+      - name: Download the file
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
           tar -czf ./rustup-home.tar.gz -C "$HOME" .cargo .rustup
-          echo "فایل در مسیر ریشه مخزن ایجاد شد: ./rustup-home.tar.gz"
+          echo "File created"
+          ls -la ./rustup-home.tar.gz
 
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add ./rustup-home.tar.gz
-          git commit -m "Add downloaded file from workflow [skip ci]" || echo "No changes to commit"
+          git status  # <--- ببین فایل اضافه شد یا نه
+          git commit -m "Add downloaded file from workflow [skip ci]"
           git push
