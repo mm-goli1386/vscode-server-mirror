@@ -11,20 +11,19 @@ jobs:
       - name: Install Rust
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          source "$HOME/.cargo/env"
-          rustc --version
-          cargo --version
       
-      - name: Save Rust installation
+      - name: Create artifact
         run: |
-          mkdir -p rust-installation/.cargo
-          mkdir -p rust-installation/.rustup
-          cp -r $HOME/.cargo/* rust-installation/.cargo/
-          cp -r $HOME/.rustup/* rust-installation/.rustup/
-          ls -la rust-installation/
+          mkdir -p rust-artifact
+          cp -r $HOME/.cargo rust-artifact/
+          cp -r $HOME/.rustup rust-artifact/
+          echo "Files copied:"
+          ls -la rust-artifact/
+          ls -la rust-artifact/.cargo/
+          ls -la rust-artifact/.rustup/
       
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: rust-installation
-          path: rust-installation/
+          path: rust-artifact
