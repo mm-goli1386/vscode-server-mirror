@@ -1,4 +1,4 @@
-name: Download VS Code Server
+name: Download Rust Installer
 
 on:
   workflow_dispatch:
@@ -15,14 +15,22 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Download VS Code Server
+      - name: Download Rust installer for Linux
         run: |
-          wget "https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init
+          mkdir -p rust-offline
+          cd rust-offline
+          wget https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init
+          wget https://static.rust-lang.org/dist/rust-1.84.0-x86_64-unknown-linux-gnu.tar.gz
+          wget https://static.rust-lang.org/dist/rust-std-1.84.0-x86_64-unknown-linux-gnu.tar.gz
+          wget https://static.rust-lang.org/dist/cargo-1.84.0-x86_64-unknown-linux-gnu.tar.gz
+          wget https://static.rust-lang.org/dist/rust-std-1.84.0-wasm32-unknown-unknown.tar.gz
+          wget https://github.com/rustwasm/wasm-bindgen/releases/download/0.2.100/wasm-bindgen-0.2.100-x86_64-unknown-linux-gnu.tar.gz
+          chmod +x rustup-init
       
       - name: Commit and Push
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add rust-lang
-          git diff --quiet && git diff --staged --quiet || git commit -m "Add VS Code Server"
+          git add rust-offline/
+          git diff --quiet && git diff --staged --quiet || git commit -m "Add Rust offline installer files"
           git push
