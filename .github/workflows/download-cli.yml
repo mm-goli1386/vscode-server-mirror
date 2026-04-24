@@ -1,27 +1,22 @@
-name: Install Rust and Upload Artifact
+name: Install Rust
 
 on:
   workflow_dispatch:
 
 jobs:
-  install-and-package-rust:
+  install-rust:
     runs-on: ubuntu-latest
+    
     steps:
       - name: Install Rust
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-
-      - name: Package Rust installation into a tarball
+          tar -czf rustup-home.tar.gz -C $HOME .cargo .rustup
+      
+      - name: Commit to repository
         run: |
-          # یک فایل فشرده از دایرکتوری‌های .cargo و .rustup می‌سازد
-          tar -czf rustup-home.tar.gz -C "$HOME" .cargo .rustup
-          echo "Tarball created successfully."
-          ls -lh rustup-home.tar.gz
-
-      - name: Upload tarball as an artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: rustup-home-backup
-          path: rustup-home.tar.gz
-          # این گزینه به جای خطا، یک اخطار نشان می‌دهد اگر فایل وجود نداشت
-          if-no-files-found: warn 
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add rustup-home.tar.gz
+          git commit -m "Add Rust installation package" || echo "No changes to commit"
+          git push
