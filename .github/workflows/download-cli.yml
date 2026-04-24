@@ -1,4 +1,4 @@
-name: Download Rust Installer
+name: Download Rust Offline Package
 
 on:
   workflow_dispatch:
@@ -12,21 +12,25 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Download Rust installer for Linux
+
+      - name: Download Rust files
         run: |
           mkdir -p rust-offline
           cd rust-offline
+          
+          # دانلود فایل نصاب اصلی
           wget https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init
-          wget https://static.rust-lang.org/dist/rust-1.84.0-x86_64-unknown-linux-gnu.tar.gz
-          wget https://static.rust-lang.org/dist/rust-std-1.84.0-x86_64-unknown-linux-gnu.tar.gz
-          wget https://static.rust-lang.org/dist/cargo-1.84.0-x86_64-unknown-linux-gnu.tar.gz
-          wget https://static.rust-lang.org/dist/rust-std-1.84.0-wasm32-unknown-unknown.tar.gz
-          wget https://github.com/rustwasm/wasm-bindgen/releases/download/0.2.100/wasm-bindgen-0.2.100-x86_64-unknown-linux-gnu.tar.gz
           chmod +x rustup-init
-      
+          
+          # دانلود فایل‌های اجزای Rust (اختیاری، اما برای نصب کامل آفلاین مفید است)
+          wget https://static.rust-lang.org/dist/rust-1.85.0-x86_64-unknown-linux-gnu.tar.gz
+          wget https://static.rust-lang.org/dist/rust-std-1.85.0-x86_64-unknown-linux-gnu.tar.gz
+          wget https://static.rust-lang.org/dist/cargo-1.85.0-x86_64-unknown-linux-gnu.tar.gz
+          wget https://static.rust-lang.org/dist/rust-std-1.85.0-wasm32-unknown-unknown.tar.gz
+          
+          # دانلود wasm-bindgen-cli از GitHub (نیازمند لینک صحیح)
+          wget https://github.com/rustwasm/wasm-bindgen/releases/download/0.2.102/wasm-bindgen-0.2.102-x86_64-unknown-linux-gnu.tar.gz
+
       - name: Commit and Push
         run: |
           git config user.name "GitHub Actions"
