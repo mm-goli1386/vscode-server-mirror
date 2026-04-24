@@ -1,26 +1,30 @@
-name: Install Rust and Upload Artifact
+name: Download and Commit File
 
 on:
   workflow_dispatch:
 
 jobs:
-  install-and-package-rust:
+  download-and-commit:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # اجازه push به مخزن
+
     steps:
-      - name: Install Rust
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download the file (مثال: نصب Rust)
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          tar -czf ./rustup-home.tar.gz -C "$HOME" .cargo .rustup
+          echo "فایل در مسیر ریشه مخزن ایجاد شد: ./rustup-home.tar.gz"
 
-      - name: Package Rust installation into a tarball
+      - name: Commit and push
         run: |
-          # فشرده‌سازی مستقیم در دایرکتوری جاری (GITHUB_WORKSPACE)
-          tar -czf rustup-home.tar.gz -C "$HOME" .cargo .rustup
-          echo "✅ Tarball created: $(pwd)/rustup-home.tar.gz"
-          ls -lh rustup-home.tar.gz
-
-      - name: Upload tarball as an artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: rustup-home-backup
-          path: rustup-home.tar.gz   # مسیر نسبی از ریشه پروژه
-          if-no-files-found: error   # با error واقعی مواجه شوم، بفهمم
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ./rustup-home.tar.gz
+          git commit -m "Add downloaded file from workflow [skip ci]" || echo "No changes to commit"
+          git push
