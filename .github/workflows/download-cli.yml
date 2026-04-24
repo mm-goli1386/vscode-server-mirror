@@ -6,24 +6,20 @@ on:
 jobs:
   install-rust:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write  # این را اضافه کنید
-    
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}  # این را اضافه کنید
-      
       - name: Install Rust
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          tar -czf rustup-home.tar.gz -C $HOME .cargo .rustup
-      
-      - name: Commit and push
+          
+      - name: Package
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add rustup-home.tar.gz
-          git commit -m "Add Rust backup file" || echo "Nothing to commit"
-          git push
+          cd ~
+          tar -czf /tmp/rustup-home.tar.gz .cargo .rustup
+          mv /tmp/rustup-home.tar.gz .
+          ls -la
+          
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: rustup-home-backup
+          path: ./rustup-home.tar.gz
