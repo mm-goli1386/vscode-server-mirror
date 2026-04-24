@@ -1,48 +1,28 @@
-name: Download Rust Offline Package
+name: Install Rust
 
 on:
-  workflow_dispatch:
-
-permissions:
-  contents: write
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  workflow_dispatch:  # اجرای دستی
 
 jobs:
-  download:
+  install-rust:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download Rust files
+      - name: Install Rust
         run: |
-          mkdir -p rust-offline
-          cd rust-offline
-          
-          # روش 1: دانلود با curl (معتبرتر از wget در اکشن)
-          curl -L -o rustup-init https://github.com/rust-lang/rustup/releases/download/1.27.1/rustup-init-x86_64-unknown-linux-gnu
-          chmod +x rustup-init
-          
-          # روش 2: دانلود بسته کامل Rust (نسخه پایدار)
-          curl -L -o rust.tar.gz https://github.com/rust-lang/rust/archive/refs/tags/1.85.0.tar.gz
-          
-          # روش 3: دانلود wasm-bindgen
-          curl -L -o wasm-bindgen.tar.gz https://github.com/rustwasm/wasm-bindgen/releases/download/0.2.102/wasm-bindgen-0.2.102-x86_64-unknown-linux-gnu.tar.gz
-          
-          # ایجاد فایل راهنما
-          echo "نحوه نصب:" > INSTALL.txt
-          echo "./rustup-init -y" >> INSTALL.txt
-          echo "source ~/.cargo/env" >> INSTALL.txt
-          echo "rustup target add wasm32-unknown-unknown" >> INSTALL.txt
-          echo "tar -xzf wasm-bindgen.tar.gz" >> INSTALL.txt
-          echo "sudo cp wasm-bindgen-*/wasm-bindgen /usr/local/bin/" >> INSTALL.txt
-
-      - name: Commit and Push
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          source "$HOME/.cargo/env"
+          rustc --version
+          cargo --version
+      
+      - name: Save Rust installation
         run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git add rust-offline/
-          git diff --quiet && git diff --staged --quiet || git commit -m "Add Rust offline installer files"
-          git push
+          mkdir rust-installation
+          cp -r $HOME/.cargo rust-installation/
+          cp -r $HOME/.rustup rust-installation/
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-installation
+          path: rust-installation/
